@@ -4,31 +4,31 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 func getHTML(rawURL string) (string, error) {
-
 	res, err := http.Get(rawURL)
-
 	if err != nil {
-		return "", fmt.Errorf("error")
+		return "", fmt.Errorf("got Network error: %v", err)
 	}
-
 	defer res.Body.Close()
 
 	if res.StatusCode > 399 {
-		return "", fmt.Errorf("unsuccess request")
+		return "", fmt.Errorf("got HTTP error: %s", res.Status)
 	}
 
-	if res.Header.Get("Content-Type") != "text/html" {
-		return "", fmt.Errorf("bad content-type header")
+	contentType := res.Header.Get("Content-Type")
+	if !strings.Contains(contentType, "text/html") {
+		return "", fmt.Errorf("got non-HTML response: %s", contentType)
 	}
 
-	body, err := io.ReadAll(res.Body)
-
+	htmlBodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
-		return "", fmt.Errorf("error")
+		return "", fmt.Errorf("couldn't read response body: %v", err)
 	}
 
-	return string(body), nil
+	htmlBody := string(htmlBodyBytes)
+
+	return htmlBody, nil
 }

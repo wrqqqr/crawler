@@ -12,11 +12,13 @@ func normalizeURL(rawURL string) (string, error) {
 		return "", fmt.Errorf("couldn't parse URL: %w", err)
 	}
 
-	fullPath := parsedURL.Host + parsedURL.Path
+	fullPath := parsedURL.Scheme + "://" + parsedURL.Host + parsedURL.Path
 
 	fullPath = strings.ToLower(fullPath)
 
 	fullPath = strings.TrimSuffix(fullPath, "/")
+
+	fmt.Println(fullPath)
 
 	return fullPath, nil
 }
